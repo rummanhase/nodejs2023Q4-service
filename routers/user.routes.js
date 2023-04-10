@@ -100,9 +100,9 @@ route.put('/user/:id', async (req, res) => {
         });
         return;
     }
-    let result = users.find(user => user.id == id)
-    if(result.password === oldPassword){
-        result.password = newPassword;
+    const index = users.findIndex(user => user.id == id);
+    if(users[index].password === oldPassword){
+        users[index].password = newPassword;
         res.status(200).send({
             result:"success",
             message:"Updated Successfully"
