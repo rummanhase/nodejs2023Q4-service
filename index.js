@@ -1,7 +1,13 @@
-const express = require('express');
+const express = require('./dependencies');
+const userRoute = require('./routers/user.routes')
+const PORT = 4000;
 
 const app = express();
+app.use(express.json());
 
-app.listen(4000 , ()=>{
-    console.log("App is listening at 4000");
+
+app.use("/" , userRoute);
+
+app.listen( PORT, ()=>{
+    console.log("App is listening at "+PORT);
 })
