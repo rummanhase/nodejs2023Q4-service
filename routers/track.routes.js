@@ -36,7 +36,7 @@ route.get('/track/:id', async (req, res) => {
     res.status(200).send({
         result: "success",
         id: result.id,
-        track : result.trackName
+        track : result.track
     });
 });
 
