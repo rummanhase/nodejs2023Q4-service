@@ -3,9 +3,13 @@ const userLogic = require("../buissenessLogics/user.logic");
 
 route.get('/user' , async (req , res)=>{
     let users = userLogic.user;
+    let result_users = users;
+    for(let i=0 ; i<result_users.length ; i++){
+        delete result_users[i].password;
+    }
     res.status(200).send({
         resuult:"success",
-        users:users
+        users:result_users
     })
 }) 
 
@@ -32,9 +36,11 @@ route.get('/user/:id', async (req, res) => {
         return;
     }
     let result = users.find(user => user.id == id)
+    delete result.password
     console.log(result);
     res.status(200).send({
         result: "success",
+        user:result,
         id: result.id,
     });
 });
@@ -67,7 +73,11 @@ route.post('/user' , async (req , res)=>{
         login:login,password:password
     }
     users.push({
-        id:new_id,login:login,password:password
+        id:new_id,
+        login:login,
+        password:password,
+        version: 1, 
+        createdAt: new Date(), 
     })
 
     res.status(201).send({
@@ -81,6 +91,7 @@ route.put('/user/:id', async (req, res) => {
     let users = userLogic.user;
     let id = req.params.id;
     const {oldPassword , newPassword} = req.body;
+    console.log(oldPassword);
     console.log(id);
     if (!id || isNaN(id)) {
         res.status(400).send({
@@ -102,9 +113,14 @@ route.put('/user/:id', async (req, res) => {
     }
     const index = users.findIndex(user => user.id == id);
     if(users[index].password === oldPassword){
+        users[index].version = users[index].version+1;
+        users[index].updatedAt = new Date();
         users[index].password = newPassword;
-        res.status(200).send({
+        let result_user = users[index]
+        delete result_user.password;
+            res.status(200).send({
             result:"success",
+            user:result_user,
             message:"Updated Successfully"
         })
         return;
