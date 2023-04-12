@@ -1,8 +1,8 @@
 const route = require('../dependencies').Router();
 const favourites = require("../buissenessLogics/favs.logic");
 const tracksLogic = require("../buissenessLogics/track.logic");
-const albumLogic = require("../buissenessLogics/album.logic");
-const artistLogic = require("../buissenessLogics/artist.logic");
+const albumsLogic = require("../buissenessLogics/album.logic");
+const artistsLogic = require("../buissenessLogics/artist.logic");
 
 route.get('/favs' , async (req , res)=>{
     let favs = favourites;
@@ -23,15 +23,12 @@ route.post('/favs/track/:id' , async (req , res)=>{
     }
     let favs = favourites;
     const tracks = tracksLogic.track;
-    console.log(tracks);
-    console.log(favs.tracks);
     const index = tracks.findIndex(fav => fav.id == id);
-    
-    console.log(tracks[index]);
-    if(index !== -1){
+
+    if(index == -1){
         res.status(403).send({
             resuult:"failure",
-            message: "this fav already exists"
+            message: "this track is not present in your trackjlist"
         })
         return;
     }else{
@@ -46,68 +43,146 @@ route.post('/favs/track/:id' , async (req , res)=>{
     }
 })
 
-route.put('/favs/:id', async (req, res) => {
-    let favs = favourites;
-    let id = req.params.id;
-    const newfav = req.body;
-    // console.log(id);
-    if (!id || isNaN(id)) {
-        res.status(400).send({
-            result: "failure",
-            message: "Not a valid UUID"
-        });
-        return;
-    }
-    const index = favs.findIndex(fav => fav.id == id);
-    console.log(index);
-    if (index==-1) {
-        res.status(404).send({
-            result: "failure",
-            message: "fav with this id does not exist"
-        });
-        return;
-    }
-    let favName = req.body.fav;
-    if(!favName){
+route.delete('/favs/track/:id' , async (req , res)=>{
+    let id = req.params.id
+    if(!id){
         res.status(400).send({
             resuult:"failure",
-            message: "Please provide full information"
+            message: "Please provide id"
         })
         return
     }
-    
-    console.log(newfav);
-    favs[index].favName = newfav.fav;
-    res.status(200).send({
-        result:"success",
-        message:"Updated Successfully"
-    })
-});
+    let favsTracks = favourites.tracks;
+    const index = favsTracks.findIndex(fav => fav.id == id);
 
-route.delete('/favs/:id', async (req, res) => {
-    let favs = favourites;
-    let id = req.params.id;
-    console.log(id);
-    if (!id || isNaN(id)) {
+    if(index == -1){
+        res.status(403).send({
+            resuult:"failure",
+            message: "this track is not present in your favourites"
+        })
+        return;
+    }else{
+        favourites.tracks = favourites.tracks.filter(track => track.id != id)
+        console.log(favourites);
+        res.status(201).send({
+            result:"success",
+            message:"track deleted succesfully"
+        })
+    }
+})
+
+
+route.post('/favs/album/:id' , async (req , res)=>{
+    let id = req.params.id
+    if(!id){
         res.status(400).send({
-            result: "failure",
-            message: "Not a valid UUID"
-        });
-        return;
+            resuult:"failure",
+            message: "Please provide id"
+        })
+        return
     }
-    const index = favs.findIndex(fav => fav.id == id);
-    console.log(index);
-    if (index==-1) {
-        res.status(404).send({
-            result: "failure",
-            message: "fav with this id does not exist"
-        });
+    let favs = favourites;
+    const albums = albumsLogic.album;
+    const index = albums.findIndex(fav => fav.id == id);
+
+    if(index == -1){
+        res.status(403).send({
+            resuult:"failure",
+            message: "this album is not present in your albumjlist"
+        })
         return;
+    }else{
+        let album_add = albums[index]
+        favs.albums.push(album_add);
+        res.status(201).send({
+            result:"success",
+            message:"albums updated succesfully"
+        })
     }
-    favs.splice(index , 1)
-    res.status(200).send({
-        result:"success",
-        message:"Deleted Successfully"
-    })
-});
+})
+
+route.delete('/favs/album/:id' , async (req , res)=>{
+    let id = req.params.id
+    if(!id){
+        res.status(400).send({
+            resuult:"failure",
+            message: "Please provide id"
+        })
+        return
+    }
+    let favsalbums = favourites.albums;
+    const index = favsalbums.findIndex(fav => fav.id == id);
+
+    if(index == -1){
+        res.status(403).send({
+            resuult:"failure",
+            message: "this album is not present in your favourites"
+        })
+        return;
+    }else{
+        favourites.albums = favourites.albums.filter(album => album.id != id)
+        console.log(favourites);
+        res.status(201).send({
+            result:"success",
+            message:"album deleted succesfully"
+        })
+    }
+})
+
+route.post('/favs/artist/:id' , async (req , res)=>{
+    let id = req.params.id
+    if(!id){
+        res.status(400).send({
+            resuult:"failure",
+            message: "Please provide id"
+        })
+        return
+    }
+    let favs = favourites;
+    const artists = artistsLogic.artist;
+    const index = artists.findIndex(fav => fav.id == id);
+
+    if(index == -1){
+        res.status(403).send({
+            resuult:"failure",
+            message: "this artist is not present in your artistlist"
+        })
+        return;
+    }else{
+        let artist_add = artists[index]
+        favs.artists.push(artist_add);
+        res.status(201).send({
+            result:"success",
+            message:"artists updated succesfully"
+        })
+    }
+})
+
+route.delete('/favs/artist/:id' , async (req , res)=>{
+    let id = req.params.id
+    if(!id){
+        res.status(400).send({
+            resuult:"failure",
+            message: "Please provide id"
+        })
+        return
+    }
+    let favsartists = favourites.artists;
+    const index = favsartists.findIndex(fav => fav.id == id);
+
+    if(index == -1){
+        res.status(403).send({
+            resuult:"failure",
+            message: "this artist is not present in your favourites"
+        })
+        return;
+    }else{
+        favourites.artists = favourites.artists.filter(artist => artist.id != id)
+        console.log(favourites);
+        res.status(201).send({
+            result:"success",
+            message:"artist deleted succesfully"
+        })
+    }
+})
 module.exports = route;

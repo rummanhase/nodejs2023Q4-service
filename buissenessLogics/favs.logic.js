@@ -10,7 +10,12 @@ const Album = [
         "albumName": "Baby ye"
     }
 ];
-const Track = []
+const Track = [
+    {
+        id:1,
+        track:"Ae dil ki mushkil"
+    }
+]
 
 const favs = {
     artists: Artist,
